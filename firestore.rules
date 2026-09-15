@@ -1,0 +1,39 @@
+rules_version = '2';
+service cloud.firestore {
+ match /databases/{database}/documents {
+  function member(t) {
+   return request.auth != null && request.auth.token.tenantId == t
+    && exists(/databases/$(database)/documents/tenants/$(t)/staff/$(request.auth.uid));
+  }
+  function admin(t) {
+   return member(t) && request.auth.token.role == 'Admin'
+    && get(/databases/$(database)/documents/tenants/$(t)/staff/$(request.auth.uid)).data.role == 'Admin';
+  }
+  function text(v, max) { return v is string && v.size() <= max; }
+  function appointment(t) {
+   let d = request.resource.data;
+   return d.keys().hasAll(['customerId','customerName','vehicleName','reason','staffId','datetime','status'])
+    && d.keys().hasOnly(['customerId','customerName','vehicleName','reason','staffId','datetime','status'])
+    && text(d.customerId,128) && text(d.customerName,100) && d.customerName.size() > 0
+    && text(d.vehicleName,100) && text(d.staffId,128)
+    && exists(/databases/$(database)/documents/tenants/$(t)/staff/$(d.staffId))
+    && exists(/databases/$(database)/documents/tenants/$(t)/customers/$(d.customerId))
+    && d.reason in ['試乗','商談','車検'] && d.status in ['未対応','対応中','完了'] && d.datetime is timestamp;
+  }
+  match /tenants/{t} {
+   allow read: if member(t);
+   allow update: if admin(t) && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['name']) && text(request.resource.data.name,100) && request.resource.data.name.size() > 0;
+   match /staff/{id} { allow read: if member(t); }
+   match /invites/{id} { allow read: if admin(t); }
+   match /appointments/{id} {
+    allow read: if member(t);
+    allow create,update: if member(t) && appointment(t);
+    allow delete: if member(t);
+   }
+   match /customers/{id} {
+    allow read: if member(t);
+    allow create,update: if member(t) && request.resource.data.keys().hasAll(['name','contact','memo']) && request.resource.data.keys().hasOnly(['name','contact','memo']) && text(request.resource.data.name,100) && request.resource.data.name.size() > 0 && text(request.resource.data.contact,200) && text(request.resource.data.memo,2000);
+   }
+  }
+ }
+}

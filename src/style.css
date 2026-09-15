@@ -1,0 +1,374 @@
+@import "tailwindcss";
+:root {
+  font-family: Inter, "Noto Sans JP", system-ui, sans-serif;
+  color-scheme: light;
+  --bg: #f4f6f9;
+  --panel: #fff;
+  --text: #20304b;
+  --muted: #6b7890;
+  --line: #e0e6ee;
+  --accent: #4664d9;
+  --tint: #edf1ff;
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #101722;
+  --panel: #192332;
+  --text: #edf1f7;
+  --muted: #a0adc2;
+  --line: #303d50;
+  --accent: #829aff;
+  --tint: #253455;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+}
+header {
+  height: 86px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 4%;
+  background: var(--panel);
+  border-bottom: 1px solid var(--line);
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 23px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+.brand svg {
+  color: var(--accent);
+}
+.brand small {
+  display: block;
+  font-size: 8px;
+  letter-spacing: 0.18em;
+  color: var(--muted);
+}
+main {
+  max-width: 1600px;
+  margin: auto;
+  padding: 36px 4%;
+}
+h1 {
+  font-size: 28px;
+  font-weight: 750;
+  margin: 6px 0;
+}
+h2 {
+  font-size: 18px;
+  font-weight: 700;
+}
+h3 {
+  font-weight: 700;
+}
+p {
+  color: var(--muted);
+  margin: 12px 0;
+}
+button,
+input,
+select {
+  font: inherit;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  color: var(--text);
+  padding: 10px 13px;
+}
+button {
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+}
+button:hover {
+  border-color: var(--accent);
+}
+button:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}
+button:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+.primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+  font-weight: 650;
+}
+.actions,
+.heading,
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.heading,
+.toolbar {
+  justify-content: space-between;
+}
+.eyebrow {
+  font-size: 10px;
+  font-weight: 750;
+  letter-spacing: 0.18em;
+  color: var(--accent);
+}
+nav {
+  display: flex;
+  gap: 6px;
+  border-bottom: 1px solid var(--line);
+  margin: 24px 0;
+}
+nav button {
+  border: 0;
+  background: none;
+  border-radius: 0;
+  padding: 14px 22px;
+}
+nav .active {
+  color: var(--accent);
+  border-bottom: 3px solid var(--accent);
+  font-weight: 700;
+}
+.toolbar {
+  margin: 22px 0;
+}
+.summary {
+  display: flex;
+  gap: 30px;
+  font-size: 13px;
+  color: var(--muted);
+  padding: 0 0 16px;
+}
+.summary b {
+  color: var(--text);
+  font-size: 18px;
+  margin: 0 4px;
+}
+.calendar {
+  display: grid;
+  grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
+  border-left: 1px solid var(--line);
+  border-top: 1px solid var(--line);
+}
+.day {
+  min-height: 230px;
+  background: var(--panel);
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  padding: 10px;
+}
+.day h3 {
+  margin: 0 0 16px;
+  font-size: 19px;
+}
+.day h3 small {
+  font-size: 11px;
+  color: var(--muted);
+}
+.day.today h3 {
+  color: var(--accent);
+}
+.day.today {
+  background: var(--tint);
+}
+.appointment {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-left: 3px solid #d4a34c;
+  border-radius: 7px;
+  margin: 8px 0;
+  padding: 8px;
+}
+.appointment.s1 {
+  border-left-color: #6489ee;
+}
+.appointment.s2 {
+  border-left-color: #5ca88a;
+}
+.card-main {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  width: 100%;
+  gap: 5px;
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+.card-main strong {
+  font-size: 14px;
+}
+.time {
+  font-size: 10px;
+  color: var(--accent);
+}
+.card-main small {
+  color: var(--muted);
+}
+.appointment select {
+  font-size: 10px;
+  padding: 3px;
+  margin-top: 8px;
+  width: 100%;
+}
+.kanban {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+.column {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 20px;
+  min-height: 400px;
+}
+.column h3 {
+  margin: 0 0 20px;
+}
+.column h3 small {
+  color: var(--muted);
+  margin-left: 10px;
+}
+.empty {
+  text-align: center;
+  margin-top: 60px;
+  font-size: 13px;
+}
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 30px;
+}
+.auth {
+  max-width: 440px;
+  margin: 70px auto;
+}
+.auth h1 {
+  margin: 14px 0;
+}
+label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 13px;
+  margin: 16px 0;
+}
+form .primary {
+  margin-top: 10px;
+}
+.link {
+  background: none;
+  border: 0;
+  color: var(--accent);
+  padding: 12px 0;
+  font-size: 12px;
+  display: block;
+}
+.error {
+  background: #fee9e9;
+  color: #9b2626;
+  border-radius: 8px;
+  padding: 12px;
+  overflow-wrap: anywhere;
+}
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  background: #080f2299;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.modal {
+  width: 480px;
+  max-height: 90vh;
+  overflow: auto;
+}
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.danger {
+  color: #d45d5d;
+  border: 0;
+  background: none;
+  margin-top: 20px;
+}
+.admin h2 {
+  margin: 20px 0;
+}
+.table-wrap {
+  overflow: auto;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 13px;
+}
+td,
+th {
+  padding: 14px;
+  border-bottom: 1px solid var(--line);
+}
+th {
+  color: var(--muted);
+  font-weight: 500;
+}
+.padding {
+  background: var(--bg);
+}
+@media (max-width: 800px) {
+  header {
+    height: 72px;
+  }
+  .heading,
+  .toolbar {
+    align-items: flex-start;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .toolbar h2 {
+    font-size: 12px;
+  }
+  .calendar {
+    overflow: auto;
+    grid-template-columns: repeat(var(--cols), minmax(140px, 1fr));
+  }
+  .kanban {
+    grid-template-columns: 1fr;
+  }
+  .auth {
+    margin: 30px 16px;
+  }
+  .actions {
+    flex-wrap: wrap;
+  }
+  .brand {
+    font-size: 18px;
+  }
+}
