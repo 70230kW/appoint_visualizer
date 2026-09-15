@@ -8,7 +8,11 @@
     "build": "vite build",
     "test": "node --test tests/*.test.js",
     "test:rules": "firebase emulators:exec --only firestore --project demo-appoint 'node --test tests/rules.test.mjs'",
-    "test:functions": "firebase emulators:exec --only auth,firestore,functions --project demo-appoint 'node --test tests/functions.test.cjs'"
+    "test:functions": "firebase emulators:exec --config firebase.blaze.json --only auth,firestore,functions --project demo-appoint 'node --test tests/functions.test.cjs'",
+    "deploy:spark": "npm run build && firebase deploy --config firebase.json --project appointment-visualizer --only firestore,hosting",
+    "deploy:blaze": "npm run build && firebase deploy --config firebase.blaze.json --project appointment-visualizer --only firestore,functions,hosting",
+    "test:provision": "firebase emulators:exec --only auth,firestore --project demo-appoint \"node --test tests/provision.test.cjs\"",
+    "provision": "node scripts/provision.cjs"
   },
   "dependencies": {
     "react": "^19.1.1",

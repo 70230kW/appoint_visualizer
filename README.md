@@ -1,74 +1,49 @@
-# あぽびじゅ
+# あぽびじゅ — 無料β版
 
-React / Vite / Firebase による店舗別の来店予約管理アプリです。
+店舗ごとの来店予約を管理するReact / Vite / Firebaseアプリ。現在は **Firebase Sparkプラン** 用です。予約CRUD、カレンダー6期間、カンバン、店舗分離、Admin / Staff、テーマ切替を利用できます。スタッフは運営が登録します。
 
-## 実装機能
-
-- メール／パスワード認証、メール確認後の招待受諾
-- Admin / Staff と店舗単位のアクセス制御
-- 7日間・1回限りの招待、失効、日次の期限切れ処理
-- 来店予約の追加・編集・削除、担当者・目的・対応状況
-- 1日 / 3日 / 5日 / 1週間 / 2週間 / 1か月カレンダー
-- 同じ期間の予約を表示するカンバン（状態はセレクトで変更）
-- 個人単位のライト／ダークテーマ保存
-- スタッフ一覧と招待履歴
-
-## 開発
-
-Node.js 22、Java 21 推奨。
+## 公開（Codespaces）
 
 ```sh
+git pull --ff-only origin chore/firebase-project
+nvm install 22
+nvm use 22
 npm ci
-npm ci --prefix functions
-cp .env.example .env.local
-npm run dev
+npm run deploy:spark
 ```
 
-Firebase Console のWebアプリ設定を `.env.local` に入力します。サービスアカウント秘密鍵を `VITE_` 変数に入れないでください。
+`deploy:spark` はビルド後、Firestore Rules / indexes と Hosting のみを `appointment-visualizer` に公開します。Cloud Functions・Scheduler・Cloud Buildはデプロイしません。Firebase CLIのログインが必要です。無料枠の上限は適用されます。
+
+提供されたFirebase Web設定は組み込み済みです。フロントエンドに環境変数がなくても接続します。他プロジェクトやエミュレーター利用時は `.env.example` を参照。
+
+## 最初の管理者・スタッフ
+
+[無料版の導入手順](docs/spark-setup.md) を参照してください。**Webサイトの公開だけでは、店舗と所属ユーザーは作成されません。**
+
+## 検証
+
+Node.js 22 / Java 21を推奨します。
 
 ```sh
+npm ci --prefix functions
 npm test
 npm run test:rules
-npm run test:functions
+npm run test:provision
 npm run build
 ```
 
-ルールとFunctionsテストは `demo-appoint` エミュレーターのみを利用します。ローカル画面からも使う場合は、同じプロジェクトIDと `VITE_USE_EMULATORS=true` を設定し、`npx firebase emulators:start --only auth,firestore,functions --project demo-appoint` を別ターミナルで起動します。
+テストは `demo-appoint` エミュレーターのみで動きます。将来用の招待処理は `npm run test:functions` で検証します。
 
-## 初回導入
+## 将来Blazeに移行する場合
 
-1. FirebaseプロジェクトでFirestoreとAuthenticationのEmail/Passwordを有効化。
-2. Firebase Consoleで最初の管理者ユーザーを作成し、メール認証を完了。
-3. 信頼できる環境でApplication Default Credentialsを設定して次を実行。
+1. 課金プランを変更し、`firebase.blaze.json` でFunctionsとSchedulerをデプロイ。
+2. 招待処理の動作確認後、環境変数 `VITE_ENABLE_INVITES=true` を設定して `npm run deploy:blaze` を実行。
+3. 自動招待の画面が有効になります。既存の店舗・スタッフ・予約・Claimsはそのまま利用できます。
 
-```sh
-node scripts/bootstrap.cjs PROJECT_ID TENANT_ID AUTH_UID '店舗名'
-```
+現時点のデフォルトは無料版です。`firebase.json` にFunctions設定を含めていません。過去にBlazeで公開済みのFunctionsを停止する操作ではありません。本プロジェクトではFunctionsの公開は未完了でした。
 
-4. Webアプリ用の環境変数を設定してビルド。
-5. 対象プロジェクトを明示してデプロイ。
+## 移行と設計
 
-```sh
-npm run build
-npx firebase deploy --project PROJECT_ID --only firestore,functions,hosting
-```
+旧データは提供されていません。`scripts/migrate.cjs` は既存顧客・予約をコピーするドライラン対応のテンプレートです。スタッフUID対応を確認し、バックアップを取ってから実行してください。
 
-6. 管理者としてログインし、店舗管理からスタッフを招待。リンクを開いた人は登録、メール認証、招待受諾の順に操作。
-
-本リポジトリに本番FirebaseプロジェクトIDや認証情報は含めていません。Cloud Functions・Schedulerを利用可能なFirebaseプロジェクトの準備が必要です。
-
-## 移行
-
-元のコード・データはリポジトリに存在しませんでした。移行スクリプトはルートの `customers` / `appointments` を店舗配下へコピーするための出発点です。元データのスキーマ・担当者UID・顧客参照を確認してから利用します。まず移行先テナントとスタッフを用意してください。
-
-```sh
-node scripts/migrate.cjs PROJECT_ID TENANT_ID
-# ドライラン結果とバックアップ確認後のみ
-node scripts/migrate.cjs PROJECT_ID TENANT_ID --apply
-```
-
-元データは削除しません。同じIDで異なるデータが移行先に存在すれば中止し、同一データはスキップします。スタッフと認証UIDの対応は自動推定しません。運用中データは書き込みを止めてバックアップ後に移行し、件数と参照を検証してください。
-
-## 設計上の判断と残作業
-
-[実装メモ](docs/implementation.md) を参照してください。
+[詳細設計の実装メモ](docs/implementation.md) は当初のBlaze構成の記録です。無料版では本READMEと [Spark導入手順](docs/spark-setup.md) を優先してください。

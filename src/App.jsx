@@ -1,8 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { onIdTokenChanged, signOut } from "firebase/auth";
+import {
+  onIdTokenChanged,
+  signOut,
+  sendEmailVerification,
+} from "firebase/auth";
 import { CalendarDays, Sun, Moon, LogOut } from "lucide-react";
 import { auth, configured } from "./firebase";
 import { message } from "./errors";
+import { invitesEnabled } from "./features";
 import Login from "./Login";
 import Accept from "./Accept";
 import Workspace from "./Workspace";
@@ -10,6 +15,7 @@ export default function App() {
   const [session, setSession] = useState(null),
     [loading, setLoading] = useState(configured),
     [error, setError] = useState("");
+  const [notice, setNotice] = useState("");
   const [theme, setTheme] = useState(() => {
     try {
       return (
@@ -71,6 +77,7 @@ export default function App() {
           {error}
         </p>
       )}
+      {notice && <p role="status">{notice}</p>}
       {!configured ? (
         <main className="auth panel">
           <h1>あぽびじゅへようこそ</h1>
@@ -78,6 +85,12 @@ export default function App() {
         </main>
       ) : loading ? (
         <main>読み込み中…</main>
+      ) : invite.has("token") && !invitesEnabled ? (
+        <main className="auth panel">
+          <h1>招待リンクの受付は停止中です</h1>
+          <p>店舗への参加は運営担当者にお問い合わせください。</p>
+          <a href="/">ログイン画面へ戻る</a>
+        </main>
       ) : !session ? (
         <Login invited={invite.has("token")} />
       ) : invite.has("token") ? (
@@ -89,11 +102,35 @@ export default function App() {
         />
       ) : (
         <main className="auth panel">
-          <h1>店舗への招待をお待ちください</h1>
-          <p>管理者から届いた招待リンクを開くと利用を開始できます。</p>
+          <h1>店舗への登録をお待ちください</h1>
+          <p>
+            運営担当者に店舗への登録を依頼してください。登録後に所属情報を更新すると利用を開始できます。
+          </p>
+          <p>{session.user.email}</p>
+          {!session.user.emailVerified && (
+            <>
+              <p>初回はメールアドレスの確認が必要です。</p>
+              <button
+                onClick={() =>
+                  sendEmailVerification(session.user)
+                    .then(() =>
+                      setNotice(
+                        "確認メールを送信しました。メール内のリンクを開いてください。",
+                      ),
+                    )
+                    .catch((e) => setError(message(e)))
+                }
+              >
+                確認メールを送信
+              </button>
+            </>
+          )}
           <button
             onClick={() =>
-              session.user.getIdToken(true).catch((e) => setError(message(e)))
+              session.user
+                .reload()
+                .then(() => session.user.getIdToken(true))
+                .catch((e) => setError(message(e)))
             }
           >
             所属情報を更新
