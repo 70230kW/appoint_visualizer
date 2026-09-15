@@ -1,0 +1,28 @@
+{
+  "name": "appoint-visualizer",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "vite build",
+    "test": "node --test tests/*.test.js",
+    "test:rules": "firebase emulators:exec --only firestore --project demo-appoint 'node --test tests/rules.test.mjs'",
+    "test:functions": "firebase emulators:exec --only auth,firestore,functions --project demo-appoint 'node --test tests/functions.test.cjs'"
+  },
+  "dependencies": {
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "firebase": "^12.2.1",
+    "dayjs": "^1.11.13",
+    "lucide-react": "^0.468.0"
+  },
+  "devDependencies": {
+    "vite": "^7.1.5",
+    "@vitejs/plugin-react": "^5.0.2",
+    "tailwindcss": "^4.1.13",
+    "@tailwindcss/vite": "^4.1.13",
+    "@firebase/rules-unit-testing": "^5.0.0",
+    "firebase-tools": "^14.17.0"
+  }
+}
