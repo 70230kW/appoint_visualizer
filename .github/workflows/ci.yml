@@ -19,4 +19,5 @@ jobs:
       - run: npm run build
       - run: node --check functions/index.js
       - run: npm run test:rules
+      - run: npm run test:provision
       - run: npm run test:functions
